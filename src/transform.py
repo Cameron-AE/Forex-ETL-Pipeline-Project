@@ -10,16 +10,26 @@ def clean_column_names(df: pd.DataFrame):
 
 def fix_dates(df:pd.DataFrame):
     df=df.copy()
+    df["Date"]=df["Date"].astype(str).str.strip()
     df["Date"]=pd.to_datetime(df["Date"], errors="coerce")
+    df=df.dropna(subset=["Date"]).reset_index(drop=True)
     return df
 
 def remove_duplicate_columns(df:pd.DataFrame):
     df=df.loc[:,~df.columns.duplicated()]
     return df
 
-def melt_to_long_format(df:pd.DataFrame):
-    value_cols=[c for c in df.columns if c != "Date"]
-    df_long=df.melt(id_vars="Date", var_name="metric",value_name="value")
+def melt_to_long_format(df: pd.DataFrame):
+    
+    df = df.copy()
+    
+    
+    value_cols = [c for c in df.columns if c != "Date"]
+    df_long = df.melt(id_vars=['Date'], value_vars=value_cols,
+                      var_name='metric', value_name='value')
+    
+    df_long = df_long.dropna(subset=['value']).reset_index(drop=True)
+    
     return df_long
 
 def split_metric(df: pd.DataFrame):
