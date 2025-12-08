@@ -22,6 +22,12 @@ def melt_to_long_format(df:pd.DataFrame):
     df_long=df.melt(id_vars="Date", var_name="metric",value_name="value")
     return df_long
 
+def split_metric(df: pd.DataFrame):
+    df = df.copy()
+    if "metric" in df.columns:
+        df[['pair', 'type']] = df['metric'].str.split('_',n=1, expand=True)
+    return df
+
 def transform(df:pd.DataFrame):
     print("Transforming Data")
 
@@ -29,6 +35,7 @@ def transform(df:pd.DataFrame):
     df=fix_dates(df)
     df=remove_duplicate_columns(df)
     df=melt_to_long_format(df)
+    df=split_metric(df)
 
     print(f"Transformed into long format with {len(df)} rows")
     return df
